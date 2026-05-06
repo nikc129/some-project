@@ -2,3 +2,4 @@ Flask==3.0.0
 prometheus_client==0.18.0
 boto3==1.28.0
 watchtower==5.0.0
+gunicorn
