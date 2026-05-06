@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ product.name }} | Aura{% endblock %}
+
+{% block content %}
+<div class="product-detail glass-panel">
+    <div class="product-detail-image">
+        <img src="{{ product.image_url }}" alt="{{ product.name }}">
+    </div>
+    <div class="product-detail-info">
+        <h1>{{ product.name }}</h1>
+        <p class="price large">${{ "%.2f"|format(product.price) }}</p>
+        <p class="description">{{ product.description }}</p>
+        
+        <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="post">
+            <button type="submit" class="btn btn-primary btn-large">Add to Cart</button>
+        </form>
+        <a href="{{ url_for('index') }}" class="back-link">&larr; Back to Products</a>
+    </div>
+</div>
+{% endblock %}

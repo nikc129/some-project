@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% block title %}Your Cart | Aura{% endblock %}
+
+{% block content %}
+<div class="cart-container glass-panel">
+    <h1>Your Cart</h1>
+    
+    {% if cart_items %}
+        <div class="cart-items">
+            {% for item in cart_items %}
+                <div class="cart-item glass-panel-inner">
+                    <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" class="cart-item-image">
+                    <div class="cart-item-details">
+                        <h3>{{ item.product.name }}</h3>
+                        <p class="cart-item-price">${{ "%.2f"|format(item.product.price) }}</p>
+                    </div>
+                    <div class="cart-item-quantity">
+                        <p>Qty: {{ item.quantity }}</p>
+                    </div>
+                    <div class="cart-item-subtotal">
+                        <p>${{ "%.2f"|format(item.subtotal) }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="cart-summary">
+            <div class="total">
+                <span>Total:</span>
+                <span>${{ "%.2f"|format(total) }}</span>
+            </div>
+            <div class="cart-actions">
+                <form action="{{ url_for('clear_cart') }}" method="post" class="inline-form">
+                    <button type="submit" class="btn btn-secondary">Clear Cart</button>
+                </form>
+                <button class="btn btn-primary">Checkout</button>
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-cart">
+            <p>Your cart is currently empty.</p>
+            <a href="{{ url_for('index') }}" class="btn btn-primary">Continue Shopping</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
