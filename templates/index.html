@@ -6,27 +6,31 @@
 <section class="hero glass-panel">
     <div class="hero-content">
         <h1>Elevate Your Lifestyle</h1>
-        <p>Discover our curated collection of premium electronics designed for the modern aesthetic.</p>
+        <p>Discover our curated collection of premium electronics and tech accessories designed for the modern aesthetic.</p>
     </div>
 </section>
 
 <section class="products-section">
-    <h2 class="section-title">Featured Products</h2>
-    <div class="product-grid">
-        {% for product in products %}
-            <div class="product-card glass-panel">
-                <div class="product-image-container">
-                    <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-image">
+    <div class="container">
+        <h2 class="section-title">Featured Products</h2>
+        <p style="text-align: center; color: var(--text-muted); margin-bottom: 3rem;">Browse our selection of {{ products|length }} premium items</p>
+        <div class="product-grid">
+            {% for product in products %}
+                <div class="product-card glass-panel">
+                    <div class="product-image-container">
+                        <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-image">
+                    </div>
+                    <div class="product-info">
+                        <h3><a href="{{ url_for('product', product_id=product.id) }}">{{ product.name }}</a></h3>
+                        <p style="color: var(--text-muted); font-size: 0.95rem; flex: 1;">{{ product.description[:60] }}...</p>
+                        <p class="price">${{ "%.2f"|format(product.price) }}</p>
+                        <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="post">
+                            <button type="submit" class="btn btn-primary">Add to Cart</button>
+                        </form>
+                    </div>
                 </div>
-                <div class="product-info">
-                    <h3><a href="{{ url_for('product', product_id=product.id) }}">{{ product.name }}</a></h3>
-                    <p class="price">${{ "%.2f"|format(product.price) }}</p>
-                    <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="post">
-                        <button type="submit" class="btn btn-primary">Add to Cart</button>
-                    </form>
-                </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
 </section>
 {% endblock %}

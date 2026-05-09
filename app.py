@@ -94,39 +94,93 @@ def init_db():
         demo_products = [
             (
                 'Acoustic Noise Cancelling Headphones',
-                'Premium wireless headphones with industry-leading noise cancellation.',
+                'Premium wireless headphones with industry-leading noise cancellation. 30-hour battery life.',
                 299.99,
                 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80'
             ),
             (
                 'Mechanical Gaming Keyboard',
-                'Tactile switches, RGB lighting, aluminum frame.',
+                'Tactile switches, RGB lighting, aluminum frame. Custom programmable keys.',
                 149.99,
                 'https://images.unsplash.com/photo-1595225476474-87563907a212?w=500&q=80'
             ),
             (
                 '4K Action Camera',
-                'Waterproof, records 4K at 60fps.',
+                'Waterproof, records 4K at 60fps. Built-in stabilization.',
                 199.99,
                 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&q=80'
             ),
             (
                 'Smart Fitness Watch',
-                'Track heart rate, sleep, activity.',
+                'Track heart rate, sleep, activity. Water resistant design.',
                 249.99,
                 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80'
             ),
             (
                 'Power Bank',
-                '10000mAh fast charging.',
+                '10000mAh fast charging. Dual USB outputs.',
                 49.99,
                 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=500&q=80'
             ),
             (
                 'Desk Lamp',
-                'LED lamp with USB port.',
+                'LED lamp with USB port. 5 brightness levels.',
                 79.99,
                 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=500&q=80'
+            ),
+            (
+                'Wireless Mouse',
+                'Precision tracking, ergonomic design. 2-year battery life.',
+                59.99,
+                'https://images.unsplash.com/photo-1527814050087-3793815479db?w=500&q=80'
+            ),
+            (
+                'USB-C Hub',
+                '7-in-1 multi-port hub. Supports 4K video output.',
+                89.99,
+                'https://images.unsplash.com/photo-1625948515291-69613efd103f?w=500&q=80'
+            ),
+            (
+                'Portable SSD 1TB',
+                'Fast transfer speeds, compact design. USB 3.2 Gen 2.',
+                149.99,
+                'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&q=80'
+            ),
+            (
+                'Wireless Charger',
+                'Fast charging pad. Works with all Qi devices.',
+                34.99,
+                'https://images.unsplash.com/photo-1591954191477-d625d51b5c2e?w=500&q=80'
+            ),
+            (
+                '4K Webcam',
+                'Crystal clear video. Built-in microphone with noise cancellation.',
+                179.99,
+                'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=500&q=80'
+            ),
+            (
+                'Laptop Stand',
+                'Adjustable aluminum stand. Supports up to 17 inch laptops.',
+                44.99,
+                'https://images.unsplash.com/photo-1587829191301-f0e7e2d9c2a0?w=500&q=80'
+            ),
+            (
+                'Mechanical Pen Display',
+                '15.6 inch display, pressure sensitive. Perfect for design work.',
+                399.99,
+                'https://images.unsplash.com/photo-1612198188060-c7c2a3b66eae?w=500&q=80'
+            ),
+            (
+                'Premium Cable Organizer',
+                'Silicone cable management. Keeps desk tidy.',
+                24.99,
+                'https://images.unsplash.com/photo-1592849385229-26ec4cf57d13?w=500&q=80'
+            ),
+            (
+                'Smart LED Strip Lights',
+                'RGB color changing. App controlled, music sync.',
+                69.99,
+                'https://images.unsplash.com/photo-1570902522859-dfd71a099a0c?w=500&q=80'
             )
         ]
 
@@ -345,6 +399,42 @@ def clear_cart():
     flash('Cart cleared!')
 
     return redirect(url_for('cart'))
+
+@app.route('/checkout', methods=['POST'])
+def checkout():
+
+    cart_ids = session.get('cart', [])
+
+    if not cart_ids:
+        flash('Your cart is empty!')
+        return redirect(url_for('cart'))
+
+    # Calculate total
+    conn = get_db()
+    placeholders = ','.join('?' for _ in cart_ids)
+    query = f'SELECT * FROM products WHERE id IN ({placeholders})'
+    products = conn.execute(query, cart_ids).fetchall()
+    conn.close()
+
+    from collections import Counter
+    counts = Counter(cart_ids)
+    product_dict = {p['id']: p for p in products}
+    
+    total = 0
+    for pid, qty in counts.items():
+        if pid in product_dict:
+            total += product_dict[pid]['price'] * qty
+
+    # Clear cart after checkout
+    session['cart'] = []
+    session.modified = True
+
+    return redirect(url_for('thank_you', total=f"{total:.2f}"))
+
+@app.route('/thank-you')
+def thank_you():
+    total = request.args.get('total', '0.00')
+    return render_template('thank_you.html', total=total)
 
 # -------------------------------------------------
 # 🟢 PROMETHEUS METRICS ENDPOINT
